@@ -1,6 +1,5 @@
-import { launch } from "jsr:@astral/astral@0.5.3"
-import pixelmatch from "https://esm.sh/pixelmatch@7.1.0"
-import sharp from "npm:sharp@0.34.3"
+import { launch } from "./src/deps.ts"
+import { compare } from "./src/compare.ts"
 
 await using browser = await launch()
 
@@ -16,16 +15,9 @@ page.setViewportSize(dimension)
 const screenshot = await page.screenshot()
 // await Deno.writeFile("temp/a.png", screenshot)
 
-const process =
-(buf: Uint8Array<ArrayBufferLike>) =>
-    sharp(buf).ensureAlpha().png().raw().toBuffer()
-
 console.log(
-    pixelmatch(
-        await process(screenshot),
-        await process(await Deno.readFile("temp/a.png")),
-        void 0,
-        640,
-        360,
+    await compare(
+        screenshot,
+        await Deno.readFile("temp/a.png"),
     )
 )
